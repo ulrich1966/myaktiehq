@@ -4,12 +4,13 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_margin"
-    tools:context=".AktienListeFragment">
+
+    android:padding="@dimen/activity_horizontal_margin"
+    tools:context=".MainActivityFragment">
 
 
     <ListView
-        android:id="@+id/listview_aktienlist"
+        android:id="@+id/listview_aktienliste"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
