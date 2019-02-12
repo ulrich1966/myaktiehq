@@ -5,5 +5,5 @@
     android:id="@+id/fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name="com.example.myaktiehq.MainActivityFragment"
-    tools:layout="@layout/fragment_main"/>
+    android:name="com.example.myaktiehq.AktienListeFragment"
+    tools:layout="@layout/fragment_aktienliste"/>

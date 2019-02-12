@@ -8,6 +8,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Bla Bla
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -24,11 +27,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean success = false;
+        boolean success;
         switch (item.getItemId()) {
             case R.id.action_settings:
                 Toast.makeText(this, "Setting wurde gedrückt", Toast.LENGTH_SHORT).show();
-                ListView lv = findViewById(R.id.listView_aktienliste);
+                ListView lv = findViewById(R.id.listview_aktienlist);
                 success = true;
                 //bla
                 break;
