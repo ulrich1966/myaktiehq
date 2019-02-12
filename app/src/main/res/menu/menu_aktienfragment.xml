@@ -5,7 +5,7 @@
     tools:context=".MainActivity">
 
     <item android:id="@+id/action_daten_aktualisieren"
-        android:title="@string/action_settings"
+        android:title="@string/action_daten_akrialisieren"
         android:orderInCategory="200"
         app:showAsAction="never"/>
 
