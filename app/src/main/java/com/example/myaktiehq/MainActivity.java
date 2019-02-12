@@ -13,12 +13,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
+        return true;
     }
 
     @Override
@@ -27,9 +28,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 Toast.makeText(this, "Setting wurde gedrückt", Toast.LENGTH_SHORT).show();
-                ListView lv = findViewById(R.id.list_item_aktienliste_textview);
                 success = true;
-                //bla
                 break;
             default:
                 success = super.onOptionsItemSelected(item);
