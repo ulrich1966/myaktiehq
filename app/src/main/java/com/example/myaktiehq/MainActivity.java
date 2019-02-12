@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +28,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_settings:
                 Toast.makeText(this, "Setting wurde gedrückt", Toast.LENGTH_SHORT).show();
-                TextView txt = findViewById(R.id.textView);
-                txt.setText("moin");
+                ListView lv = findViewById(R.id.listView_aktienliste);
                 success = true;
                 //bla
                 break;
