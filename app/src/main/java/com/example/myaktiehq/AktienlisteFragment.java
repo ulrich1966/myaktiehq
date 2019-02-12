@@ -2,6 +2,7 @@ package com.example.myaktiehq;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AktienlisteFragment extends Fragment {
+    private static final String TAG = AktienlisteFragment.class.getName()+"\n\b-->";
     public AktienlisteFragment() {
         super();
     }
@@ -24,6 +26,7 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
 
         String[] aktienlisteArray = {
                 "Adidas - Kurs: 73,45 €",
@@ -56,6 +59,7 @@ public class AktienlisteFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         // Menü bekannt geben, dadurch kann unser Fragment Menü-Events verarbeiten
         setHasOptionsMenu(true);
@@ -63,11 +67,13 @@ public class AktienlisteFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.d(TAG, "onCreateOptionsMenu");
         inflater.inflate(R.menu.menu_aktienfragment, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected");
         // Wir prüfen, ob Menü-Element mit der ID "action_daten_aktualisieren"
         // ausgewählt wurde und geben eine Meldung aus
         int id = item.getItemId();
