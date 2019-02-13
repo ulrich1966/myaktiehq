@@ -145,9 +145,6 @@ public class AktienlisteFragment extends Fragment {
 
                 Log.v(TAG, "doInBackground: " + aktiendatenXmlString);
                 publishProgress(1,1);
-
-                leseXmlAktiendatenAus(aktiendatenXmlString);
-
             } catch (IOException e) { // Beim Holen der Daten trat ein Fehler auf, daher Abbruch
                 Log.e(TAG, "doInBackground: Error ", e);
                 return null;
@@ -164,7 +161,7 @@ public class AktienlisteFragment extends Fragment {
                 }
             }
 
-            return null;
+            return leseXmlAktiendatenAus(aktiendatenXmlString);
         }
 
         @Override
@@ -189,6 +186,7 @@ public class AktienlisteFragment extends Fragment {
             super.onProgressUpdate(values);
         }
 
+        @org.jetbrains.annotations.Nullable
         private String[] leseXmlAktiendatenAus(String xmlString) {
             Document doc;
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
