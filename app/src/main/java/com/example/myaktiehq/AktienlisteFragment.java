@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,10 +87,10 @@ public class AktienlisteFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public class HoleDaten extends AsyncTask<String, Integer, String> {
+    public class HoleDaten extends AsyncTask<String, Integer, String[]> {
         @Override
-        protected String doInBackground(String... strings) {
-            return new String[];
+        protected String[] doInBackground(String... strings) {
+            return new String[0];
         }
 
         @Override
@@ -100,8 +99,8 @@ public class AktienlisteFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(String[] strings) {
+            super.onPostExecute(strings);
         }
 
         @Override
