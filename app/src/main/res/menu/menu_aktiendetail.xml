@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/bla_settings"
-        android:title="@string/bla_settings"
+        android:title="Bla"
         android:orderInCategory="300"
         app:showAsAction="never" />
 
