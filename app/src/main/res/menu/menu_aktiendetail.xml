@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="de.programmierenlernenhq.aktiehq.app.AktiendetailActivity">
+    tools:context=".AktiendetailActivity">
 
     <item
-        android:id="@+id/bla_settings"
-        android:title="Bla"
-        android:orderInCategory="300"
+        android:id="@+id/activity_aktiendetail"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
         app:showAsAction="never" />
 
 </menu>

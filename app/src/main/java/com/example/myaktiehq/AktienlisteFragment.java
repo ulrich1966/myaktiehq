@@ -79,6 +79,7 @@ public class AktienlisteFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 String aktienInfo = (String) adapterView.getItemAtPosition(position);
+                Toast.makeText(getActivity(), aktienInfo, Toast.LENGTH_SHORT).show();
                 Intent aktiendetailIntent = new Intent(getActivity(), AktiendetailActivity.class);
                 aktiendetailIntent.putExtra(Intent.EXTRA_TEXT, aktienInfo);
                 startActivity(aktiendetailIntent);
