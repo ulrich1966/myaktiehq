@@ -146,6 +146,8 @@ public class AktienlisteFragment extends Fragment {
                 Log.v(TAG, "doInBackground: " + aktiendatenXmlString);
                 publishProgress(1,1);
 
+                leseXmlAktiendatenAus(aktiendatenXmlString);
+
             } catch (IOException e) { // Beim Holen der Daten trat ein Fehler auf, daher Abbruch
                 Log.e(TAG, "doInBackground: Error ", e);
                 return null;
@@ -188,7 +190,6 @@ public class AktienlisteFragment extends Fragment {
         }
 
         private String[] leseXmlAktiendatenAus(String xmlString) {
-
             Document doc;
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             try {
@@ -197,13 +198,13 @@ public class AktienlisteFragment extends Fragment {
                 is.setCharacterStream(new StringReader(xmlString));
                 doc = db.parse(is);
             } catch (ParserConfigurationException e) {
-                Log.e(TAG,"Error: " + e.getMessage());
+                Log.e(TAG,"leseXmlAktiendatenAus: Error " + e);
                 return null;
             } catch (SAXException e) {
-                Log.e(TAG,"Error: " + e.getMessage());
+                Log.e(TAG,"leseXmlAktiendatenAus: Error " + e);
                 return null;
             } catch (IOException e) {
-                Log.e(TAG,"Error: " + e.getMessage());
+                Log.e(TAG,"leseXmlAktiendatenAus: Error " + e);
                 return null;
             }
 
