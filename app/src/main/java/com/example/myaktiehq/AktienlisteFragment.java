@@ -24,6 +24,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import java.io.StringReader;
+
 public class AktienlisteFragment extends Fragment {
     private static final String TAG = AktienlisteFragment.class.getName() + "\n\b-->";
     private ArrayAdapter<String> mAktienlisteAdapter = null;
@@ -120,20 +131,23 @@ public class AktienlisteFragment extends Fragment {
                 if (inputStream == null) {
                     return null;
                 }
+
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
 
                 while ((line = bufferedReader.readLine()) != null) {
                     aktiendatenXmlString += line + "\n";
                 }
+
                 if (aktiendatenXmlString.length() == 0) {
                     return null;
                 }
-                Log.v(TAG, "Aktiendaten XML-String: " + aktiendatenXmlString);
+
+                Log.v(TAG, "doInBackground: " + aktiendatenXmlString);
                 publishProgress(1,1);
 
             } catch (IOException e) { // Beim Holen der Daten trat ein Fehler auf, daher Abbruch
-                Log.e(TAG, "Error ", e);
+                Log.e(TAG, "doInBackground: Error ", e);
                 return null;
             } finally {
                 if (httpURLConnection != null) {
@@ -143,28 +157,12 @@ public class AktienlisteFragment extends Fragment {
                     try {
                         bufferedReader.close();
                     } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
+                        Log.e(TAG, "doInBackground: Error", e);
                     }
                 }
             }
 
-            // Hier parsen wir später die XML Aktiendaten
-
             return null;
-//
-//            String[] ergebinsArray = new String[20];
-//            for (int i = 0; i < ergebinsArray.length; i++) {
-//                ergebinsArray[i] = String.format("%s_%s", strings[0], (i+1));
-//                if(i%5 == 4){
-//                    publishProgress(i+1, 20);
-//                }
-//                try {
-//                    Thread.sleep(600);
-//                } catch (InterruptedException e){
-//                    Log.e(TAG, "doInBackground: Error", e);
-//                }
-//            }
-//            return ergebinsArray;
         }
 
         @Override
@@ -187,6 +185,58 @@ public class AktienlisteFragment extends Fragment {
         protected void onProgressUpdate(Integer... values) {
             Toast.makeText(getActivity(), String.format("%s von %s geladen", values[0], values[1]), Toast.LENGTH_SHORT).show();
             super.onProgressUpdate(values);
+        }
+
+        private String[] leseXmlAktiendatenAus(String xmlString) {
+
+            Document doc;
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            try {
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                InputSource is = new InputSource();
+                is.setCharacterStream(new StringReader(xmlString));
+                doc = db.parse(is);
+            } catch (ParserConfigurationException e) {
+                Log.e(TAG,"Error: " + e.getMessage());
+                return null;
+            } catch (SAXException e) {
+                Log.e(TAG,"Error: " + e.getMessage());
+                return null;
+            } catch (IOException e) {
+                Log.e(TAG,"Error: " + e.getMessage());
+                return null;
+            }
+
+            Element xmlAktiendaten = doc.getDocumentElement();
+            NodeList aktienListe = xmlAktiendaten.getElementsByTagName("row");
+
+            int anzahlAktien = aktienListe.getLength();
+            int anzahlAktienParameter = aktienListe.item(0).getChildNodes().getLength();
+
+            String[] ausgabeArray = new String[anzahlAktien];
+            String[][] alleAktienDatenArray = new String[anzahlAktien][anzahlAktienParameter];
+
+            Node aktienParameter;
+            String aktienParameterWert;
+            for( int i=0; i<anzahlAktien; i++ ) {
+                NodeList aktienParameterListe = aktienListe.item(i).getChildNodes();
+
+                for (int j=0; j<anzahlAktienParameter; j++) {
+                    aktienParameter = aktienParameterListe.item(j);
+                    aktienParameterWert = aktienParameter.getFirstChild().getNodeValue();
+                    alleAktienDatenArray[i][j] = aktienParameterWert;
+                }
+
+                ausgabeArray[i]  = alleAktienDatenArray[i][0];                // symbol
+                ausgabeArray[i] += ": " + alleAktienDatenArray[i][4];         // price
+                ausgabeArray[i] += " " + alleAktienDatenArray[i][2];          // currency
+                ausgabeArray[i] += " (" + alleAktienDatenArray[i][8] + ")";   // percent
+                ausgabeArray[i] += " - [" + alleAktienDatenArray[i][1] + "]"; // name
+
+                Log.v(TAG,"XML Output:" + ausgabeArray[i]);
+            }
+
+            return ausgabeArray;
         }
     }
 }
