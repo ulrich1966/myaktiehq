@@ -1,5 +1,6 @@
 package com.example.myaktiehq;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,12 +14,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class AktienlisteFragment extends Fragment {
-    private static final String TAG = AktienlisteFragment.class.getName()+"\n\b-->";
+    private static final String TAG = AktienlisteFragment.class.getName() + "\n\b-->";
+
     public AktienlisteFragment() {
         super();
     }
@@ -83,5 +86,27 @@ public class AktienlisteFragment extends Fragment {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public class HoleDaten extends AsyncTask<String, Integer, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            return new String[];
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+        }
     }
 }
