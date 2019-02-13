@@ -14,6 +14,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,19 +99,72 @@ public class AktienlisteFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(String... strings) {
-            String[] ergebinsArray = new String[20];
-            for (int i = 0; i < ergebinsArray.length; i++) {
-                ergebinsArray[i] = String.format("%s_%s", strings[0], (i+1));
-                if(i%5 == 4){
-                    publishProgress(i+1, 20);
+            if(strings == null && strings.length == 0){
+                return null;
+            }
+            final String URL_PARAMETER = "http://www.programmierenlernenhq.de/tools/query.php";
+            String symbols = "DAI.DE,BMW.DE";
+
+            String anfrageString = String.format("%s?s=%s", URL_PARAMETER, symbols);
+            Log.v(TAG, "doInBackground: " + anfrageString);
+
+            HttpURLConnection httpURLConnection = null;
+            BufferedReader bufferedReader = null;
+
+            String aktiendatenXmlString = "";
+
+            try {
+                URL url = new URL(anfrageString);
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                if (inputStream == null) {
+                    return null;
                 }
-                try {
-                    Thread.sleep(600);
-                } catch (InterruptedException e){
-                    Log.e(TAG, "doInBackground: Error", e);
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+
+                while ((line = bufferedReader.readLine()) != null) {
+                    aktiendatenXmlString += line + "\n";
+                }
+                if (aktiendatenXmlString.length() == 0) {
+                    return null;
+                }
+                Log.v(TAG, "Aktiendaten XML-String: " + aktiendatenXmlString);
+                publishProgress(1,1);
+
+            } catch (IOException e) { // Beim Holen der Daten trat ein Fehler auf, daher Abbruch
+                Log.e(TAG, "Error ", e);
+                return null;
+            } finally {
+                if (httpURLConnection != null) {
+                    httpURLConnection.disconnect();
+                }
+                if (bufferedReader != null) {
+                    try {
+                        bufferedReader.close();
+                    } catch (final IOException e) {
+                        Log.e(TAG, "Error closing stream", e);
+                    }
                 }
             }
-            return ergebinsArray;
+
+            // Hier parsen wir später die XML Aktiendaten
+
+            return null;
+//
+//            String[] ergebinsArray = new String[20];
+//            for (int i = 0; i < ergebinsArray.length; i++) {
+//                ergebinsArray[i] = String.format("%s_%s", strings[0], (i+1));
+//                if(i%5 == 4){
+//                    publishProgress(i+1, 20);
+//                }
+//                try {
+//                    Thread.sleep(600);
+//                } catch (InterruptedException e){
+//                    Log.e(TAG, "doInBackground: Error", e);
+//                }
+//            }
+//            return ergebinsArray;
         }
 
         @Override
