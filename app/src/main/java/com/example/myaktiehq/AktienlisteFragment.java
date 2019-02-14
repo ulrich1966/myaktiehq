@@ -1,8 +1,10 @@
 package com.example.myaktiehq;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -107,13 +109,18 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "onOptionsItemSelected");
-        // Wir prüfen, ob Menü-Element mit der ID "action_daten_aktualisieren"
-        // ausgewählt wurde und geben eine Meldung aus
         int id = item.getItemId();
         if (id == R.id.action_daten_aktualisieren) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String sharedPreferencesKey = getString(R.string.preference_aktienliste_key);
+            String sharedPreferencesDefault = getString(R.string.preference_aktienliste_default);
+            String aktenListe = sharedPreferences.getString(sharedPreferencesKey, sharedPreferencesDefault);
+            
             HoleDatenTask holeDatenTask = new HoleDatenTask();
-            holeDatenTask.execute("Aktie");
+            holeDatenTask.execute(aktenListe);
+
             Toast.makeText(getActivity(), "Aktualisieren gedrückt!", Toast.LENGTH_LONG).show();
+
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -127,8 +134,9 @@ public class AktienlisteFragment extends Fragment {
             if(strings == null && strings.length == 0){
                 return null;
             }
+
             final String URL_PARAMETER = "http://www.programmierenlernenhq.de/tools/query.php";
-            String symbols = "DAI.DE,BMW.DE";
+            String symbols = strings[0];
 
             String anfrageString = String.format("%s?s=%s", URL_PARAMETER, symbols);
             Log.v(TAG, "doInBackground: " + anfrageString);

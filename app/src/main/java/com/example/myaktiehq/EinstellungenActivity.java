@@ -1,10 +1,11 @@
 package com.example.myaktiehq;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 
 public class EinstellungenActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
@@ -12,12 +13,17 @@ public class EinstellungenActivity extends PreferenceActivity implements Prefere
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Toast.makeText(this, "Einstellungen gestartet.", Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "Zurück mit Back-Button.", Toast.LENGTH_SHORT).show();
+        addPreferencesFromResource(R.xml.preferences);
+        Preference aktenlistePref = findPreference(getString(R.string.preference_aktienliste_key));
+        aktenlistePref.setOnPreferenceChangeListener(this);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String gespeichertereAktenliste = sharedPreferences.getString(aktenlistePref.getKey(), "");
+        onPreferenceChange(aktenlistePref, gespeichertereAktenliste);
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
-        return false;
+        preference.setSummary(value.toString());
+        return true;
     }
 }
