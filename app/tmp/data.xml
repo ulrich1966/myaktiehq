@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<query>
+    <diagnostics>
+        <symbols>DAI.DE,BMW.DE</symbols>
+        <created>2019-02-13 19:06:23</created>
+    </diagnostics>
+    <results>
+        <row>
+            <symbol>DAI.DE</symbol>
+            <name>DAI</name>
+            <currency>EUR</currency>
+            <exchange>GER</exchange>
+            <price>98.02</price>
+            <date>02/13/2019</date>
+            <time>7:06pm</time>
+            <change>1.901588</change>
+            <percent>1.94%</percent>
+            <open>98.970794</open>
+            <high>100.6822232</high>
+            <low>95.7380944</low>
+            <volume>4750480</volume>
+        </row>
+        <row>
+            <symbol>BMW.DE</symbol>
+            <name>BMW</name>
+            <currency>EUR</currency>
+            <exchange>GER</exchange>
+            <price>116.12</price>
+            <date>02/13/2019</date>
+            <time>7:06pm</time>
+            <change>-1.904368</change>
+            <percent>-1.64%</percent>
+            <open>115.167816</open>
+            <high>118.7861152</high>
+            <low>113.8347584</low>
+            <volume>10982231</volume>
+        </row>
+    </results>
+</query>
