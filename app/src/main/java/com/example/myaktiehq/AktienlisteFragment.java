@@ -78,10 +78,10 @@ public class AktienlisteFragment extends Fragment {
          * aktienListe -> Beispieldaten in einer ArrayList
          */
         mAktienlisteAdapter = new ArrayAdapter<>(
-                getActivity(), // Die aktuelle Umgebung (diese Activity)
-                R.layout.list_item_aktienliste, // ID der XML-Layout Datei
-                R.id.list_item_aktienliste_textview, // ID des TextViews
-                aktienListe); // Beispieldaten in einer ArrayList
+                getActivity(),
+                R.layout.list_item_aktienliste,
+                R.id.list_item_aktienliste_textview,
+                aktienListe);
 
 
         View rootView = inflater.inflate(R.layout.fragment_aktienliste, container, false);
