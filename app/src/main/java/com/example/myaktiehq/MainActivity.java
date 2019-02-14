@@ -1,10 +1,10 @@
 package com.example.myaktiehq;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,9 +30,11 @@ public class MainActivity extends AppCompatActivity {
         boolean success;
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Toast.makeText(this, "Setting wurde gedrückt", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Einstellungen wurde gedrückt", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, EinstellungenActivity.class));
                 success = true;
                 break;
+
             default:
                 success = super.onOptionsItemSelected(item);
 

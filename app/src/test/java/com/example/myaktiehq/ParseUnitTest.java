@@ -22,7 +22,7 @@ public class ParseUnitTest {
     @Test
     public void test() {
         try {
-            File fXmlFile = new File("c:/Users/uli/temp/data.xml");
+            File fXmlFile = new File("F:/home/temp/data.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
