@@ -52,6 +52,7 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
+        List<String> aktienListe = null;
 
         /**
          * Für den Start wird für die anzuzeigene Liste ein Array definiert
@@ -68,13 +69,20 @@ public class AktienlisteFragment extends Fragment {
                 "Daimler - Kurs: 84,33 €"
         };
 
-        List<String> aktienListe = new ArrayList<>(Arrays.asList(aktienlisteArray));
+        aktienListe = new ArrayList<>(Arrays.asList(aktienlisteArray));
 
+        /**
+         * getActivity() -> Die aktuelle Umgebung (diese Activity)
+         * R.layout.list_item_aktienliste -> ID der XML-Layout Datei
+         * R.id.list_item_aktienliste_textview ->ID des TextViews
+         * aktienListe -> Beispieldaten in einer ArrayList
+         */
         mAktienlisteAdapter = new ArrayAdapter<>(
                 getActivity(), // Die aktuelle Umgebung (diese Activity)
                 R.layout.list_item_aktienliste, // ID der XML-Layout Datei
                 R.id.list_item_aktienliste_textview, // ID des TextViews
                 aktienListe); // Beispieldaten in einer ArrayList
+
 
         View rootView = inflater.inflate(R.layout.fragment_aktienliste, container, false);
 
