@@ -82,11 +82,9 @@ public class AktienlisteFragment extends Fragment {
                 R.layout.list_item_aktienliste,
                 R.id.list_item_aktienliste_textview,
                 aktienListe);
-
-        //git config --global http.sslverify "false"
         /**
-         *
-         */
+        * Instanziert und bindet eine XML-View(fragment_aktienliste.xml) Datei an eine Viewinstanz (android.view.View)
+        */
         View rootView = inflater.inflate(R.layout.fragment_aktienliste, container, false);
 
         aktienlisteListView = (ListView) rootView.findViewById(R.id.listview_aktienliste);
