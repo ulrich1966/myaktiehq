@@ -83,7 +83,10 @@ public class AktienlisteFragment extends Fragment {
                 R.id.list_item_aktienliste_textview,
                 aktienListe);
 
-
+        //git config --global http.sslverify "false"
+        /**
+         *
+         */
         View rootView = inflater.inflate(R.layout.fragment_aktienliste, container, false);
 
         aktienlisteListView = (ListView) rootView.findViewById(R.id.listview_aktienliste);
