@@ -16,10 +16,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,13 +37,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import java.io.StringReader;
 
 public class AktienlisteFragment extends Fragment {
     private static final String TAG = AktienlisteFragment.class.getName() + "\n\b-->";
@@ -158,6 +159,7 @@ public class AktienlisteFragment extends Fragment {
 
                 Log.v(TAG, "doInBackground: " + aktiendatenXmlString);
                 publishProgress(1,1);
+
             } catch (IOException e) { // Beim Holen der Daten trat ein Fehler auf, daher Abbruch
                 Log.e(TAG, "doInBackground: Error ", e);
                 return null;
@@ -208,6 +210,7 @@ public class AktienlisteFragment extends Fragment {
                 InputSource is = new InputSource();
                 is.setCharacterStream(new StringReader(xmlString));
                 doc = db.parse(is);
+
             } catch (ParserConfigurationException e) {
                 Log.e(TAG,"leseXmlAktiendatenAus: Error " + e);
                 return null;
