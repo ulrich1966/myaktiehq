@@ -24,21 +24,17 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        boolean success;
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Toast.makeText(this, "Einstellungen wurde gedrückt", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, EinstellungenActivity.class));
-                success = true;
-                break;
+                Toast.makeText(this, R.string.toast_setting_msg , Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this,EinstellungenActivity.class));
 
+                return true;
             default:
-                success = super.onOptionsItemSelected(item);
-
+                return super.onOptionsItemSelected(item);
         }
-        return success;
+
     }
 }

@@ -16,7 +16,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AktiendetailActivity"
+            android:name="com.example.myaktiehq.AktiendetailActivity"
             android:label="@string/title_activity_aktiendetail"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -29,13 +29,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EinstellungenActivity"
+            android:name="com.example.myaktiehq.EinstellungenActivity"
             android:label="@string/title_activity_einstellungen"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/SettingTheme" />
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.myaktiehq.MainActivity">
             </meta-data>
-    </application>
+     </application>
 
 </manifest>

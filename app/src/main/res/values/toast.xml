@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toast_moin">Moin Bremen</string>
+    <string name="toast_aktie_reqest">Aktiendaten werden abgefragt!</string>
+</resources>

@@ -53,6 +53,9 @@ public class AktienlisteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
 
+        /**
+         * Für den Start wird für die anzuzeigene Liste ein Array definiert
+         */
         String[] aktienlisteArray = {
                 "Adidas - Kurs: 73,45 €",
                 "Allianz - Kurs: 145,12 €",
@@ -68,10 +71,10 @@ public class AktienlisteFragment extends Fragment {
         List<String> aktienListe = new ArrayList<>(Arrays.asList(aktienlisteArray));
 
         mAktienlisteAdapter = new ArrayAdapter<>(
-                        getActivity(), // Die aktuelle Umgebung (diese Activity)
-                        R.layout.list_item_aktienliste, // ID der XML-Layout Datei
-                        R.id.list_item_aktienliste_textview, // ID des TextViews
-                        aktienListe); // Beispieldaten in einer ArrayList
+                getActivity(), // Die aktuelle Umgebung (diese Activity)
+                R.layout.list_item_aktienliste, // ID der XML-Layout Datei
+                R.id.list_item_aktienliste_textview, // ID des TextViews
+                aktienListe); // Beispieldaten in einer ArrayList
 
         View rootView = inflater.inflate(R.layout.fragment_aktienliste, container, false);
 
@@ -109,19 +112,30 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "onOptionsItemSelected");
-        int id = item.getItemId();
-        if (id == R.id.action_daten_aktualisieren) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String sharedPreferencesKey = getString(R.string.preference_aktienliste_key);
-            String sharedPreferencesDefault = getString(R.string.preference_aktienliste_default);
-            String aktenListe = sharedPreferences.getString(sharedPreferencesKey, sharedPreferencesDefault);
-            
-            HoleDatenTask holeDatenTask = new HoleDatenTask();
-            holeDatenTask.execute(aktenListe);
+        HoleDatenTask holeDatenTask = new HoleDatenTask();
 
-            Toast.makeText(getActivity(), "Aktualisieren gedrückt!", Toast.LENGTH_LONG).show();
+        switch (item.getItemId()) {
+            case R.id.action_daten_aktualisieren:
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String sharedPreferencesKey = getString(R.string.preference_aktienliste_key);
+                String sharedPreferencesDefault = getString(R.string.preference_aktienliste_default);
+                String aktenListe = sharedPreferences.getString(sharedPreferencesKey, sharedPreferencesDefault);
 
-            return true;
+                String prefIndizemodusKey = getString(R.string.preference_indizemodus_key);
+                Boolean indizemodus = sharedPreferences.getBoolean(prefIndizemodusKey, false);
+
+                /**
+                 * Liste der Indizes, die per Request-ULR-Parameter geladen werden sollen
+                 */
+                if (indizemodus) {
+                    String indizeliste = "^GDAXI,^TECDAX,^MDAXI,^SDAXI,^GSPC,^N225,^HSI,XAGUSD=X,XAUUSD=X";
+                    holeDatenTask.execute(indizeliste);
+                } else {
+                    holeDatenTask.execute(aktenListe);
+                }
+
+                Toast.makeText(getActivity(), R.string.toast_aktie_reqest, Toast.LENGTH_LONG).show();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -131,21 +145,16 @@ public class AktienlisteFragment extends Fragment {
 
         @Override
         protected String[] doInBackground(String... strings) {
-            if(strings == null && strings.length == 0){
+            if (strings == null && strings.length == 0) {
                 return null;
             }
-
             final String URL_PARAMETER = "http://www.programmierenlernenhq.de/tools/query.php";
             String symbols = strings[0];
-
             String anfrageString = String.format("%s?s=%s", URL_PARAMETER, symbols);
             Log.v(TAG, "doInBackground: " + anfrageString);
-
             HttpURLConnection httpURLConnection = null;
             BufferedReader bufferedReader = null;
-
             String aktiendatenXmlString = "";
-
             try {
                 URL url = new URL(anfrageString);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -153,21 +162,16 @@ public class AktienlisteFragment extends Fragment {
                 if (inputStream == null) {
                     return null;
                 }
-
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
-
                 while ((line = bufferedReader.readLine()) != null) {
                     aktiendatenXmlString += line + "\n";
                 }
-
                 if (aktiendatenXmlString.length() == 0) {
                     return null;
                 }
-
                 Log.v(TAG, "doInBackground: " + aktiendatenXmlString);
-                publishProgress(1,1);
-
+                publishProgress(1, 1);
             } catch (IOException e) { // Beim Holen der Daten trat ein Fehler auf, daher Abbruch
                 Log.e(TAG, "doInBackground: Error ", e);
                 return null;
@@ -183,7 +187,6 @@ public class AktienlisteFragment extends Fragment {
                     }
                 }
             }
-
             return leseXmlAktiendatenAus(aktiendatenXmlString);
         }
 
@@ -194,7 +197,7 @@ public class AktienlisteFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[] strings) {
-            if(strings != null){
+            if (strings != null) {
                 mAktienlisteAdapter.clear();
 //                for (String aktienString : strings){
 //                    mAktienlisteAdapter.add(aktienString);
@@ -220,13 +223,13 @@ public class AktienlisteFragment extends Fragment {
                 doc = db.parse(is);
 
             } catch (ParserConfigurationException e) {
-                Log.e(TAG,"leseXmlAktiendatenAus: Error " + e);
+                Log.e(TAG, "leseXmlAktiendatenAus: Error " + e);
                 return null;
             } catch (SAXException e) {
-                Log.e(TAG,"leseXmlAktiendatenAus: Error " + e);
+                Log.e(TAG, "leseXmlAktiendatenAus: Error " + e);
                 return null;
             } catch (IOException e) {
-                Log.e(TAG,"leseXmlAktiendatenAus: Error " + e);
+                Log.e(TAG, "leseXmlAktiendatenAus: Error " + e);
                 return null;
             }
 
@@ -241,22 +244,22 @@ public class AktienlisteFragment extends Fragment {
 
             Node aktienParameter;
             String aktienParameterWert;
-            for( int i=0; i<anzahlAktien; i++ ) {
+            for (int i = 0; i < anzahlAktien; i++) {
                 NodeList aktienParameterListe = aktienListe.item(i).getChildNodes();
 
-                for (int j=0; j<anzahlAktienParameter; j++) {
+                for (int j = 0; j < anzahlAktienParameter; j++) {
                     aktienParameter = aktienParameterListe.item(j);
                     aktienParameterWert = aktienParameter.getFirstChild().getNodeValue();
                     alleAktienDatenArray[i][j] = aktienParameterWert;
                 }
 
-                ausgabeArray[i]  = alleAktienDatenArray[i][0];                // symbol
+                ausgabeArray[i] = alleAktienDatenArray[i][0];                // symbol
                 ausgabeArray[i] += ": " + alleAktienDatenArray[i][4];         // price
                 ausgabeArray[i] += " " + alleAktienDatenArray[i][2];          // currency
                 ausgabeArray[i] += " (" + alleAktienDatenArray[i][8] + ")";   // percent
                 ausgabeArray[i] += " - [" + alleAktienDatenArray[i][1] + "]"; // name
 
-                Log.v(TAG,"XML Output:" + ausgabeArray[i]);
+                Log.v(TAG, "XML Output:" + ausgabeArray[i]);
             }
 
             return ausgabeArray;
