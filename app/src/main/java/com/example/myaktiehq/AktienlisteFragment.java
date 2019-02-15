@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -33,7 +34,6 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,9 +42,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 public class AktienlisteFragment extends Fragment {
     private static final String TAG = AktienlisteFragment.class.getName() + "\n\b-->";
-    private ArrayAdapter<String> mAktienlisteAdapter = null;
+    private ArrayAdapter<String> aktienAdapter = null;
     private ListView aktienlisteListView = null;
 
+    /**
+     * Defaulrkosrukter. Ruft super() auf.
+     */
     public AktienlisteFragment() {
         super();
     }
@@ -52,43 +55,47 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        List<String> aktienListe = null;
-
         /**
-         * Für den Start wird für die anzuzeigene Liste ein Array definiert
+         * Für den Start wird eine anzuzeigene Liste generiert.
          */
-        String[] aktienlisteArray = {
-                "Adidas - Kurs: 73,45 €",
-                "Allianz - Kurs: 145,12 €",
-                "BASF - Kurs: 84,27 €",
-                "Bayer - Kurs: 128,60 €",
-                "Beiersdorf - Kurs: 80,55 €",
-                "BMW St. - Kurs: 104,11 €",
-                "Commerzbank - Kurs: 12,47 €",
-                "Continental - Kurs: 209,94 €",
-                "Daimler - Kurs: 84,33 €"
-        };
-
-        aktienListe = new ArrayList<>(Arrays.asList(aktienlisteArray));
+        List<String> aktienListe = makeStartList();
 
         /**
-         * getActivity() -> Die aktuelle Umgebung (diese Activity)
-         * R.layout.list_item_aktienliste -> ID der XML-Layout Datei
-         * R.id.list_item_aktienliste_textview ->ID des TextViews
-         * aktienListe -> Beispieldaten in einer ArrayList
+         * Kosumiert den aktuellen Context ...
+         * >> getContext() -> Die aktuelle Umgebung (diese Activity)
+         * ... Die Referenz auf eine Layoutdatei ...
+         * >> R.layout.list_item_aktienliste -> layout/list_item_aktienliste.xml
+         * ... das in dieser Datei befindliche TextView - Element referenziert
+         *     durch die darin angegebene Id ...
+         * >> R.id.list_item_aktienliste_textview -> android:id="@+id/list_item_aktienliste_textview"
+         *  ... und eine java.util.List mit dem Datenvorrat für das AdapterArray.
+         * >> aktienListe -> Beispieldaten in einer ArrayList
+         *
+         *
          */
-        mAktienlisteAdapter = new ArrayAdapter<>(
-                getActivity(),
-                R.layout.list_item_aktienliste,
-                R.id.list_item_aktienliste_textview,
-                aktienListe);
+        //@formatter:off
+        aktienAdapter = new ArrayAdapter<>(
+                                    getContext(),
+                                    R.layout.list_item_aktienliste,
+                                    R.id.list_item_aktienliste_textview,
+                                    aktienListe);
+        //@formatter:on
         /**
-        * Instanziert und bindet eine XML-View(fragment_aktienliste.xml) Datei an eine Viewinstanz (android.view.View)
-        */
+         * Instanziert und bindet eine XML-View(fragment_aktienliste.xml) Datei an eine Viewinstanz (android.view.View).
+         * Diese View ist das RootElement, über das die Kindelemente bezogehn werden können.
+         */
         View rootView = inflater.inflate(R.layout.fragment_aktienliste, container, false);
 
+        /**
+         * Elemente, die sich in der 'rootView' befinden, können über ihre Id erreicht werden.
+         * fragment_aktienliste.xml hat z.B. eine android.widget.ListView mir der android id "@+id/frameLayout"
+         * und kann hierüber referenziert werden.
+         */
         aktienlisteListView = (ListView) rootView.findViewById(R.id.listview_aktienliste);
-        aktienlisteListView.setAdapter(mAktienlisteAdapter);
+        /**
+         *
+         */
+        aktienlisteListView.setAdapter(this.aktienAdapter);
 
         aktienlisteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -149,6 +156,26 @@ public class AktienlisteFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Erzeugt eine neue java.util.List, füllt sie mit einigen java.lang.String - Objeketen
+     * und gibt sie zurück
+     *
+     * @return java.util.List
+     */
+    private List<String> makeStartList() {
+        List<String> list = new ArrayList<>();
+        list.add("Adidas - Kurs: 73,45 €");
+        list.add("Allianz - Kurs: 145,12 €");
+        list.add("BASF - Kurs: 84,27 €");
+        list.add("Bayer - Kurs: 128,60 €");
+        list.add("Beiersdorf - Kurs: 80,55 €");
+        list.add("BMW St. - Kurs: 104,11 €");
+        list.add("Commerzbank - Kurs: 12,47 €");
+        list.add("Continental - Kurs: 209,94 €");
+        list.add("Daimler - Kurs: 84,33 €");
+        return list;
+    }
+
     public class HoleDatenTask extends AsyncTask<String, Integer, String[]> {
         private final String TAG = AsyncTask.class.getName();
 
@@ -207,11 +234,11 @@ public class AktienlisteFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             if (strings != null) {
-                mAktienlisteAdapter.clear();
+                aktienAdapter.clear();
 //                for (String aktienString : strings){
 //                    mAktienlisteAdapter.add(aktienString);
 //                }
-                mAktienlisteAdapter.addAll(strings);
+                aktienAdapter.addAll(strings);
             }
         }
 
