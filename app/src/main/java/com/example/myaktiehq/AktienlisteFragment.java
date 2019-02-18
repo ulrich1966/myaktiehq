@@ -42,7 +42,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class AktienlisteFragment extends Fragment {
-    private static final String TAG = AktienlisteFragment.class.getName() + "\n\b-->";
+    private static final String TAG = AktienlisteFragment.class.getName();
     private ArrayAdapter<String> aktienAdapter = null;
     private ListView aktienlisteListView = null;
 
@@ -107,7 +107,6 @@ public class AktienlisteFragment extends Fragment {
         aktienlisteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-
                 String aktienInfo = (String) adapterView.getItemAtPosition(position);
                 Toast.makeText(getActivity(), aktienInfo, Toast.LENGTH_SHORT).show();
                 Intent aktiendetailIntent = new Intent(getActivity(), AktiendetailActivity.class);
@@ -216,7 +215,7 @@ public class AktienlisteFragment extends Fragment {
                 }
                 Log.v(TAG, "doInBackground: " + aktiendatenXmlString);
                 publishProgress(1, 1);
-            } catch (IOException e) { // Beim Holen der Daten trat ein Fehler auf, daher Abbruch
+            } catch (IOException e) {
                 Log.e(TAG, "doInBackground: Error ", e);
                 return null;
             } finally {
@@ -265,13 +264,7 @@ public class AktienlisteFragment extends Fragment {
                 is.setCharacterStream(new StringReader(xmlString));
                 doc = db.parse(is);
 
-            } catch (ParserConfigurationException e) {
-                Log.e(TAG, "leseXmlAktiendatenAus: Error " + e);
-                return null;
-            } catch (SAXException e) {
-                Log.e(TAG, "leseXmlAktiendatenAus: Error " + e);
-                return null;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "leseXmlAktiendatenAus: Error " + e);
                 return null;
             }
