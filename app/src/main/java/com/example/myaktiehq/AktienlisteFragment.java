@@ -46,7 +46,7 @@ public class AktienlisteFragment extends Fragment {
     private ListView aktienlisteListView = null;
 
     /**
-     * Defaulrkosrukter. Ruft super() auf.
+     * Defaultconstructor. Ruft super() auf.
      */
     public AktienlisteFragment() {
         super();
