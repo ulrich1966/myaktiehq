@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,7 +26,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,12 +39,12 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 public class AktienlisteFragment extends Fragment {
     private static final String TAG = AktienlisteFragment.class.getName();
-    private ArrayAdapter<String> aktienAdapter = null;
+    private ArrayAdapter<String> mAktienAdapter = null;
     private ListView aktienlisteListView = null;
+    private SwipeRefreshLayout mSwipeRefreshLayout = null;
 
     /**
      * Defaultconstructor. Ruft super() auf.
@@ -60,7 +60,9 @@ public class AktienlisteFragment extends Fragment {
         /**
          * Für den Start wird eine anzuzeigene Liste generiert.
          */
-        List<String> aktienListe = makeStartList();
+        //List<String> aktienListe = makeStartList();
+        List<String> aktienListe = new ArrayList<>();
+
 
         /**
          * Kosumiert den aktuellen Context ...
@@ -77,7 +79,7 @@ public class AktienlisteFragment extends Fragment {
          * Werten.
          */
         //@formatter:off
-        aktienAdapter = new ArrayAdapter<>(
+        mAktienAdapter = new ArrayAdapter<>(
                                     getContext(),
                                     R.layout.list_item_aktienliste,
                                     R.id.list_item_aktienliste_textview,
@@ -100,9 +102,9 @@ public class AktienlisteFragment extends Fragment {
          * Interfaces android.widget.ListAdapter. In diesm Fall also einen android.widget.ArrayAdapter
          * und weist den der View zu.
          */
-        aktienlisteListView.setAdapter(this.aktienAdapter);
+        aktienlisteListView.setAdapter(this.mAktienAdapter);
         /**
-         * Für Aenderungen wird für das ListView-Element ein Listener implementiert ...
+         * Zum Aufrufen der Detailansicht wird fuer die ListView-Elemente ein Listener implementiert ...
          */
         aktienlisteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -115,23 +117,52 @@ public class AktienlisteFragment extends Fragment {
             }
         });
 
+        /**
+         * Das in der fragment_aktienliste.xml angelegte SwipeRefreshLayout anhand der Id
+         * einer Objektreferenz zuweisen.
+         */
+        mSwipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh_layout_aktienliste);
+        /**
+         * Dem OnRefreshListener-Objekt des SwipeRefreshLayout den Aufruf der der aktualisiereDaten Methode
+         * zuweisen und dem SwipeRefreshLayout uebergeben.
+         */
+        mSwipeRefreshLayout.setOnRefreshListener(this::aktualisiereDaten);
+        /**
+         * Wenn die View aufgebaut ist noch ein paar aktuelle Daten hinzufuegen
+         */
+        aktualisiereDaten();
+
         return rootView;
     }
 
+    /**
+     * Bei der Erzeugung dieses Frgagments wird festgelegt, dass Menue-Events verarbeitet werden sollen
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        // Menü bekannt geben, dadurch kann unser Fragment Menü-Events verarbeiten
         setHasOptionsMenu(true);
     }
 
+    /**
+     * Fuer das Menue soll als root-View die Datei menu_aktienfragment.xml mit der darin als Sub-View
+     * (TextView) vorhandene action_daten_aktualisieren verwndenden.
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Log.d(TAG, "onCreateOptionsMenu");
         inflater.inflate(R.menu.menu_aktienfragment, menu);
     }
 
+    /**
+     * Aktualisieren der Daten ueber den Menueeintragen
+     * @param item Das ausloesende Item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d(TAG, "onOptionsItemSelected");
@@ -139,28 +170,36 @@ public class AktienlisteFragment extends Fragment {
 
         switch (item.getItemId()) {
             case R.id.action_daten_aktualisieren:
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                String sharedPreferencesKey = getString(R.string.preference_aktienliste_key);
-                String sharedPreferencesDefault = getString(R.string.preference_aktienliste_default);
-                String aktenListe = sharedPreferences.getString(sharedPreferencesKey, sharedPreferencesDefault);
-
-                String prefIndizemodusKey = getString(R.string.preference_indizemodus_key);
-                Boolean indizemodus = sharedPreferences.getBoolean(prefIndizemodusKey, false);
-
-                /**
-                 * Liste der Indizes, die per Request-ULR-Parameter geladen werden sollen
-                 */
-                if (indizemodus) {
-                    String indizeliste = "^GDAXI,^TECDAX,^MDAXI,^SDAXI,^GSPC,^N225,^HSI,XAGUSD=X,XAUUSD=X";
-                    holeDatenTask.execute(indizeliste);
-                } else {
-                    holeDatenTask.execute(aktenListe);
-                }
-
-                Toast.makeText(getActivity(), R.string.toast_aktie_reqest, Toast.LENGTH_LONG).show();
+                aktualisiereDaten();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Erzeugt eine neue Klasse (HoleDatenTask) und delegiert das Erzeugen einer neuer Inhaltsliste
+     * an deren geerbter execute Methode.
+     */
+    private void aktualisiereDaten() {
+        HoleDatenTask holeDatenTask = new HoleDatenTask();
+
+        SharedPreferences sPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String prefAktienlisteKey = getString(R.string.preference_aktienliste_key);
+        String prefAktienlisteDefault = getString(R.string.preference_aktienliste_default);
+        String aktienliste = sPrefs.getString(prefAktienlisteKey, prefAktienlisteDefault);
+
+        String prefIndizemodusKey = getString(R.string.preference_indizemodus_key);
+        Boolean indizemodus = sPrefs.getBoolean(prefIndizemodusKey, false);
+
+        if (indizemodus) {
+            String indizeliste = "^GDAXI,^TECDAX,^MDAXI,^SDAXI,^GSPC,^N225,^HSI,XAGUSD=X,XAUUSD=X";
+            holeDatenTask.execute(indizeliste);
+        }
+        else {
+            holeDatenTask.execute(aktienliste);
+        }
+
+        Toast.makeText(getActivity(), "Aktiendaten werden abgefragt!", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -169,6 +208,7 @@ public class AktienlisteFragment extends Fragment {
      *
      * @return java.util.List
      */
+    @Deprecated
     private List<String> makeStartList() {
         List<String> list = new ArrayList<>();
         list.add("Adidas - Kurs: 73,45 €");
@@ -241,11 +281,12 @@ public class AktienlisteFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             if (strings != null) {
-                aktienAdapter.clear();
+                mAktienAdapter.clear();
 //                for (String aktienString : strings){
 //                    mAktienlisteAdapter.add(aktienString);
 //                }
-                aktienAdapter.addAll(strings);
+                mAktienAdapter.addAll(strings);
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         }
 
