@@ -1,11 +1,13 @@
 package com.example.myaktiehq;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,6 +53,7 @@ public class AktienlisteFragment extends Fragment {
         super();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
@@ -66,12 +68,13 @@ public class AktienlisteFragment extends Fragment {
          * ... Die Referenz auf eine Layoutdatei ...
          * >> R.layout.list_item_aktienliste -> layout/list_item_aktienliste.xml
          * ... das in dieser Datei befindliche TextView - Element referenziert
-         *     durch die darin angegebene Id ...
+         *     über die darin angegebene Id ...
          * >> R.id.list_item_aktienliste_textview -> android:id="@+id/list_item_aktienliste_textview"
          *  ... und eine java.util.List mit dem Datenvorrat für das AdapterArray.
          * >> aktienListe -> Beispieldaten in einer ArrayList
          *
-         *
+         * Der ArrayAdapter besorgt sich eine View (Element) aus einer Datei und füllt dieses mit
+         * Werten.
          */
         //@formatter:off
         aktienAdapter = new ArrayAdapter<>(
@@ -93,13 +96,18 @@ public class AktienlisteFragment extends Fragment {
          */
         aktienlisteListView = (ListView) rootView.findViewById(R.id.listview_aktienliste);
         /**
-         *
+         * Die Methode setAdapter() android.widget.ListView konsumiert eine Implementation vom des
+         * Interfaces android.widget.ListAdapter. In diesm Fall also einen android.widget.ArrayAdapter
+         * und weist den der View zu.
          */
         aktienlisteListView.setAdapter(this.aktienAdapter);
-
+        /**
+         * Für Aenderungen wird für das ListView-Element ein Listener implementiert ...
+         */
         aktienlisteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
                 String aktienInfo = (String) adapterView.getItemAtPosition(position);
                 Toast.makeText(getActivity(), aktienInfo, Toast.LENGTH_SHORT).show();
                 Intent aktiendetailIntent = new Intent(getActivity(), AktiendetailActivity.class);
@@ -248,7 +256,6 @@ public class AktienlisteFragment extends Fragment {
             super.onProgressUpdate(values);
         }
 
-        @org.jetbrains.annotations.Nullable
         private String[] leseXmlAktiendatenAus(String xmlString) {
             Document doc;
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

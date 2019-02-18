@@ -21,7 +21,7 @@ public class EinstellungenFragment extends PreferenceFragmentCompat implements P
         Preference aktienlistePref = findPreference(getString(R.string.preference_aktienliste_key));
         aktienlistePref.setOnPreferenceChangeListener((this));
 
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
         String gespeicherteAktienliste = sharedPrefs.getString(aktienlistePref.getKey(),"");
         onPreferenceChange(aktienlistePref,gespeicherteAktienliste);
     }
