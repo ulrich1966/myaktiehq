@@ -1,5 +1,6 @@
 *.bat
 *.iml
+*.zip
 .gradle
 .idea
 /local.properties
