@@ -3,6 +3,8 @@
     <string name="hello_world">Moin Bremen</string>
     <string name="action_settings">Settings</string>
     <string name="action_daten_akrialisieren">Aktualisieren</string>
+    <string name="action_starte_browser">Mehr Infos anzeigen</string>
+    <string name="action_teile_aktiendaten">Teilen</string>
 
     <string name="title_activity_aktiendetail">Aktiendetails</string>
     <string name="title_activity_einstellungen">Einstellungen</string>
