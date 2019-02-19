@@ -2,6 +2,7 @@ package com.example.myaktiehq;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -45,9 +46,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class AktienlisteFragment extends Fragment {
     private static final String TAG = AktienlisteFragment.class.getName();
-    static final String STATE_DATA = "Finanzdaten";
+    private static final String STATE_DATA = "Finanzdaten";
     private ArrayAdapter<String> mAktienAdapter = null;
-    List<String> aktienListe = null;
+    private List<String> aktienListe = null;
     private ListView aktienlisteListView = null;
     private SwipeRefreshLayout mSwipeRefreshLayout = null;
 
@@ -122,38 +123,17 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Wird aufgerufen, um die View-Hierarchie des Fragments zu erstellen");
+        boolean refresh = false;
 
         if (savedInstanceState != null) {
             // Wiederherstellen der Werte des gespeicherten Fragment-Zustands
-            String[] data = savedInstanceState.getStringArray(STATE_DATA);
+            this.aktienListe = savedInstanceState.getStringArrayList(STATE_DATA);
             Log.d(TAG, "Zustand des Fragments wieder hergestellt.");
-            this.aktienListe = Arrays.asList(data);
-            for (String e : this.aktienListe) {
-                Log.d(TAG, e);
-            }
+        } else {
+            createAdapter(getContext());
         }
 
-        /**
-         * Kosumiert den aktuellen Context ...
-         * >> getContext() -> Die aktuelle Umgebung (diese Activity)
-         * ... Die Referenz auf eine Layoutdatei ...
-         * >> R.layout.list_item_aktienliste -> layout/list_item_aktienliste.xml
-         * ... das in dieser Datei befindliche TextView - Element referenziert
-         *     über die darin angegebene Id ...
-         * >> R.id.list_item_aktienliste_textview -> android:id="@+id/list_item_aktienliste_textview"
-         *  ... und eine java.util.List mit dem Datenvorrat für das AdapterArray.
-         * >> aktienListe -> Beispieldaten in einer ArrayList
-         *
-         * Der ArrayAdapter besorgt sich eine View (Element) aus einer Datei und füllt dieses mit
-         * Werten.
-         */
-        //@formatter:off
-        mAktienAdapter = new ArrayAdapter<>(
-                                    getContext(),
-                                    R.layout.list_item_aktienliste,
-                                    R.id.list_item_aktienliste_textview,
-                                    getAktienListe());
-        //@formatter:on
+
         /**
          * Instanziert und bindet eine XML-View(fragment_aktienliste.xml) Datei an eine Viewinstanz (android.view.View).
          * Diese View ist das RootElement, über das die Kindelemente bezogehn werden können.
@@ -196,11 +176,32 @@ public class AktienlisteFragment extends Fragment {
          * zuweisen und dem SwipeRefreshLayout uebergeben.
          */
         mSwipeRefreshLayout.setOnRefreshListener(this::aktualisiereDaten);
-        /**
-         * Wenn die View aufgebaut ist noch ein paar aktuelle Daten hinzufuegen
-         */
-        aktualisiereDaten();
+
         return rootView;
+    }
+
+    private void createAdapter(Context context) {
+        /**
+         * Kosumiert den aktuellen Context ...
+         * >> getContext() -> Die aktuelle Umgebung (diese Activity)
+         * ... Die Referenz auf eine Layoutdatei ...
+         * >> R.layout.list_item_aktienliste -> layout/list_item_aktienliste.xml
+         * ... das in dieser Datei befindliche TextView - Element referenziert
+         *     über die darin angegebene Id ...
+         * >> R.id.list_item_aktienliste_textview -> android:id="@+id/list_item_aktienliste_textview"
+         *  ... und eine java.util.List mit dem Datenvorrat für das AdapterArray.
+         * >> aktienListe -> Beispieldaten in einer ArrayList
+         *
+         * Der ArrayAdapter besorgt sich eine View (Element) aus einer Datei und füllt dieses mit
+         * Werten.
+         */
+        //@formatter:off
+        mAktienAdapter = new ArrayAdapter<>(
+                                    context,
+                                    R.layout.list_item_aktienliste,
+                                    R.id.list_item_aktienliste_textview,
+                                    getAktienListe());
+        //@formatter:on
     }
 
     @Override
@@ -209,6 +210,7 @@ public class AktienlisteFragment extends Fragment {
         Log.d(TAG, "onSaveInstanceState: Daten werden gespeichert");
 
         int anzahlElemente = mAktienAdapter.getCount();
+
         String [] aktienlisteArray = new String[anzahlElemente];
         for (int i=0; i < anzahlElemente; i++) {
             aktienlisteArray[i] = mAktienAdapter.getItem(i);
@@ -255,6 +257,7 @@ public class AktienlisteFragment extends Fragment {
                 aktualisiereDaten();
                 return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
