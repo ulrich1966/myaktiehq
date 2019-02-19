@@ -45,7 +45,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 public class AktienlisteFragment extends Fragment {
-    private static final String TAG = AktienlisteFragment.class.getName();
+    private static final String TAG = AktienlisteFragment.class.getSimpleName();
     private static final String STATE_DATA = "Finanzdaten";
     private ArrayAdapter<String> mAktienAdapter = null;
     private List<String> aktienListe = null;
@@ -57,7 +57,7 @@ public class AktienlisteFragment extends Fragment {
     private final String LOG_TAG = AktienlisteFragment.class.getSimpleName();
 
     /**
-     * Defaultconstructor. Ruft super() auf.
+     * Defaulrkosrukter. Ruft super() auf.
      */
     public AktienlisteFragment() {
         super();
@@ -66,31 +66,31 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        Log.v(TAG, "onStart:");
+        Log.d(TAG, "onStart:");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.v(TAG, "onResume:");
+        Log.d(TAG, "onResume:");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.v(TAG, "onPause()");
+        Log.d(TAG, "onPause()");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.v(TAG, "onStop:");
+        Log.d(TAG, "onStop:");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.v(TAG, "onDestroy:");
+        Log.d(TAG, "onDestroy:");
     }
 
     @Override
@@ -123,17 +123,34 @@ public class AktienlisteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView: Wird aufgerufen, um die View-Hierarchie des Fragments zu erstellen");
-        boolean refresh = false;
 
         if (savedInstanceState != null) {
             // Wiederherstellen der Werte des gespeicherten Fragment-Zustands
             this.aktienListe = savedInstanceState.getStringArrayList(STATE_DATA);
             Log.d(TAG, "Zustand des Fragments wieder hergestellt.");
-        } else {
-            createAdapter(getContext());
         }
 
-
+        /**
+         * Kosumiert den aktuellen Context ...
+         * >> getContext() -> Die aktuelle Umgebung (diese Activity)
+         * ... Die Referenz auf eine Layoutdatei ...
+         * >> R.layout.list_item_aktienliste -> layout/list_item_aktienliste.xml
+         * ... das in dieser Datei befindliche TextView - Element referenziert
+         *     über die darin angegebene Id ...
+         * >> R.id.list_item_aktienliste_textview -> android:id="@+id/list_item_aktienliste_textview"
+         *  ... und eine java.util.List mit dem Datenvorrat für das AdapterArray.
+         * >> aktienListe -> Beispieldaten in einer ArrayList
+         *
+         * Der ArrayAdapter besorgt sich eine View (Element) aus einer Datei und füllt dieses mit
+         * Werten.
+         */
+        //@formatter:off
+        mAktienAdapter = new ArrayAdapter<>(
+                                    getContext(),
+                                    R.layout.list_item_aktienliste,
+                                    R.id.list_item_aktienliste_textview,
+                                    getAktienListe());
+        //@formatter:on
         /**
          * Instanziert und bindet eine XML-View(fragment_aktienliste.xml) Datei an eine Viewinstanz (android.view.View).
          * Diese View ist das RootElement, über das die Kindelemente bezogehn werden können.
@@ -176,47 +193,18 @@ public class AktienlisteFragment extends Fragment {
          * zuweisen und dem SwipeRefreshLayout uebergeben.
          */
         mSwipeRefreshLayout.setOnRefreshListener(this::aktualisiereDaten);
-
-        return rootView;
-    }
-
-    private void createAdapter(Context context) {
         /**
-         * Kosumiert den aktuellen Context ...
-         * >> getContext() -> Die aktuelle Umgebung (diese Activity)
-         * ... Die Referenz auf eine Layoutdatei ...
-         * >> R.layout.list_item_aktienliste -> layout/list_item_aktienliste.xml
-         * ... das in dieser Datei befindliche TextView - Element referenziert
-         *     über die darin angegebene Id ...
-         * >> R.id.list_item_aktienliste_textview -> android:id="@+id/list_item_aktienliste_textview"
-         *  ... und eine java.util.List mit dem Datenvorrat für das AdapterArray.
-         * >> aktienListe -> Beispieldaten in einer ArrayList
-         *
-         * Der ArrayAdapter besorgt sich eine View (Element) aus einer Datei und füllt dieses mit
-         * Werten.
+         * Wenn die View aufgebaut ist noch ein paar aktuelle Daten hinzufuegen
          */
-        //@formatter:off
-        mAktienAdapter = new ArrayAdapter<>(
-                                    context,
-                                    R.layout.list_item_aktienliste,
-                                    R.id.list_item_aktienliste_textview,
-                                    getAktienListe());
-        //@formatter:on
+        //aktualisiereDaten();
+        return rootView;
     }
 
     @Override
     public void onSaveInstanceState (Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         Log.d(TAG, "onSaveInstanceState: Daten werden gespeichert");
-
-        int anzahlElemente = mAktienAdapter.getCount();
-
-        String [] aktienlisteArray = new String[anzahlElemente];
-        for (int i=0; i < anzahlElemente; i++) {
-            aktienlisteArray[i] = mAktienAdapter.getItem(i);
-        }
-
-        savedInstanceState.putStringArray(STATE_DATA, aktienlisteArray);
+        savedInstanceState.putStringArrayList(STATE_DATA, (ArrayList<String>) this.aktienListe);
     }
 
     /**
@@ -257,13 +245,12 @@ public class AktienlisteFragment extends Fragment {
                 aktualisiereDaten();
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     /**
      * Erzeugt eine neue Klasse (HoleDatenTask) und delegiert das Erzeugen einer neuer Inhaltsliste
-     * an deren geerbter execute Methode.
+     * an deren geerbte execute Methode.
      */
     private void aktualisiereDaten() {
         HoleDatenTask holeDatenTask = new HoleDatenTask();
@@ -311,12 +298,13 @@ public class AktienlisteFragment extends Fragment {
     public List<String> getAktienListe(){
         if(this.aktienListe == null){
             this.aktienListe = new ArrayList<>();
+            aktualisiereDaten();
         }
         return this.aktienListe;
     }
 
     public class HoleDatenTask extends AsyncTask<String, Integer, String[]> {
-        private final String TAG = AsyncTask.class.getName();
+        private final String TAG = HoleDatenTask.class.getSimpleName();
 
         @Override
         protected String[] doInBackground(String... strings) {
