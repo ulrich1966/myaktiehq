@@ -17,4 +17,6 @@
     <string name="preference_indizemodus_summary">Eine Indizeliste wird anstelle der Aktienliste angezeigt.</string>
 
     <string name="toast_setting_msg">Settings wurde gedrückt</string>
+    <string name="action_kill">Beenden</string>
+    <string name="toast_setting_kill">App wird beendet</string>
 </resources>
