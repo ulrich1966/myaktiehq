@@ -1,5 +1,6 @@
 package com.example.myaktiehq;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,9 +33,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,9 +45,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 public class AktienlisteFragment extends Fragment {
     private static final String TAG = AktienlisteFragment.class.getName();
+    static final String STATE_DATA = "Finanzdaten";
     private ArrayAdapter<String> mAktienAdapter = null;
+    List<String> aktienListe = null;
     private ListView aktienlisteListView = null;
     private SwipeRefreshLayout mSwipeRefreshLayout = null;
+
+
+    // Tag für das Logging des Fragment-Lifecycle definieren
+    private final String LOG_TAG = AktienlisteFragment.class.getSimpleName();
 
     /**
      * Defaulrkosrukter. Ruft super() auf.
@@ -53,16 +62,76 @@ public class AktienlisteFragment extends Fragment {
         super();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.v(TAG, "onStart:");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.v(TAG, "onResume:");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.v(TAG, "onPause()");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.v(TAG, "onStop:");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.v(TAG, "onDestroy:");
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        Log.d(TAG, "onAttach: Wird aufgerufen, wenn das Fragment mit der Activity verbunden wurde");
+        Log.d(TAG, String.format("... Mit der Activity %s verbunden", activity.getClass().getName()));
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated: Wird aufgerufen, wenn die onCreate() Methode der Activity abgeschlossen ist");
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView: Wird aufgerufen, um die View-Hierarchie des Fragments zu entfernen");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(TAG, "onDetach: Wird aufgerufen, wenn die Verbindung zwischen Fragment und Activity gelöst wird");
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
-        /**
-         * Für den Start wird eine anzuzeigene Liste generiert.
-         */
-        //List<String> aktienListe = makeStartList();
-        List<String> aktienListe = new ArrayList<>();
+        Log.d(TAG, "onCreateView: Wird aufgerufen, um die View-Hierarchie des Fragments zu erstellen");
 
+        if (savedInstanceState != null) {
+            // Wiederherstellen der Werte des gespeicherten Fragment-Zustands
+            String[] data = savedInstanceState.getStringArray(STATE_DATA);
+            Log.d(TAG, "Zustand des Fragments wieder hergestellt.");
+            this.aktienListe = Arrays.asList(data);
+            for (String e : this.aktienListe) {
+                Log.d(TAG, e);
+            }
+        }
 
         /**
          * Kosumiert den aktuellen Context ...
@@ -83,7 +152,7 @@ public class AktienlisteFragment extends Fragment {
                                     getContext(),
                                     R.layout.list_item_aktienliste,
                                     R.id.list_item_aktienliste_textview,
-                                    aktienListe);
+                                    getAktienListe());
         //@formatter:on
         /**
          * Instanziert und bindet eine XML-View(fragment_aktienliste.xml) Datei an eine Viewinstanz (android.view.View).
@@ -131,8 +200,21 @@ public class AktienlisteFragment extends Fragment {
          * Wenn die View aufgebaut ist noch ein paar aktuelle Daten hinzufuegen
          */
         aktualisiereDaten();
-
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState (Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.d(TAG, "onSaveInstanceState: Daten werden gespeichert");
+
+        int anzahlElemente = mAktienAdapter.getCount();
+        String [] aktienlisteArray = new String[anzahlElemente];
+        for (int i=0; i < anzahlElemente; i++) {
+            aktienlisteArray[i] = mAktienAdapter.getItem(i);
+        }
+
+        savedInstanceState.putStringArray(STATE_DATA, aktienlisteArray);
     }
 
     /**
@@ -143,7 +225,7 @@ public class AktienlisteFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+        super.setHasOptionsMenu(true);
     }
 
     /**
@@ -223,6 +305,13 @@ public class AktienlisteFragment extends Fragment {
         return list;
     }
 
+    public List<String> getAktienListe(){
+        if(this.aktienListe == null){
+            this.aktienListe = new ArrayList<>();
+        }
+        return this.aktienListe;
+    }
+
     public class HoleDatenTask extends AsyncTask<String, Integer, String[]> {
         private final String TAG = AsyncTask.class.getName();
 
@@ -234,7 +323,7 @@ public class AktienlisteFragment extends Fragment {
             final String URL_PARAMETER = "http://www.programmierenlernenhq.de/tools/query.php";
             String symbols = strings[0];
             String anfrageString = String.format("%s?s=%s", URL_PARAMETER, symbols);
-            Log.v(TAG, "doInBackground: " + anfrageString);
+            Log.d(TAG, "doInBackground: " + anfrageString);
             HttpURLConnection httpURLConnection = null;
             BufferedReader bufferedReader = null;
             String aktiendatenXmlString = "";
@@ -253,7 +342,7 @@ public class AktienlisteFragment extends Fragment {
                 if (aktiendatenXmlString.length() == 0) {
                     return null;
                 }
-                Log.v(TAG, "doInBackground: " + aktiendatenXmlString);
+                Log.d(TAG, "doInBackground: " + aktiendatenXmlString);
                 publishProgress(1, 1);
             } catch (IOException e) {
                 Log.e(TAG, "doInBackground: Error ", e);
@@ -311,10 +400,10 @@ public class AktienlisteFragment extends Fragment {
             }
 
             Element xmlAktiendaten = doc.getDocumentElement();
-            NodeList aktienListe = xmlAktiendaten.getElementsByTagName("row");
+            NodeList aktienNodeListe = xmlAktiendaten.getElementsByTagName("row");
 
-            int anzahlAktien = aktienListe.getLength();
-            int anzahlAktienParameter = aktienListe.item(0).getChildNodes().getLength();
+            int anzahlAktien = aktienNodeListe.getLength();
+            int anzahlAktienParameter = aktienNodeListe.item(0).getChildNodes().getLength();
 
             String[] ausgabeArray = new String[anzahlAktien];
             String[][] alleAktienDatenArray = new String[anzahlAktien][anzahlAktienParameter];
@@ -322,7 +411,7 @@ public class AktienlisteFragment extends Fragment {
             Node aktienParameter;
             String aktienParameterWert;
             for (int i = 0; i < anzahlAktien; i++) {
-                NodeList aktienParameterListe = aktienListe.item(i).getChildNodes();
+                NodeList aktienParameterListe = aktienNodeListe.item(i).getChildNodes();
 
                 for (int j = 0; j < anzahlAktienParameter; j++) {
                     aktienParameter = aktienParameterListe.item(j);
@@ -336,7 +425,7 @@ public class AktienlisteFragment extends Fragment {
                 ausgabeArray[i] += " (" + alleAktienDatenArray[i][8] + ")";   // percent
                 ausgabeArray[i] += " - [" + alleAktienDatenArray[i][1] + "]"; // name
 
-                Log.v(TAG, "XML Output:" + ausgabeArray[i]);
+                Log.d(TAG, "XML Output:" + ausgabeArray[i]);
             }
 
             return ausgabeArray;

@@ -12,4 +12,10 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_kill"
+        android:title="@string/action_kill"
+        android:orderInCategory="300"
+        app:showAsAction="never" />
+
 </menu>
